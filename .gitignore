@@ -1,25 +1,30 @@
+# Global ignores
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.local
+.env.*.local
 
-###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
-/vendor/
-###< symfony/framework-bundle ###
+# Symfony (api)
+api/var/
+api/vendor/
+api/public/bundles/
+api/composer.lock
+api/node_modules/
 
-###> phpunit/phpunit ###
-/phpunit.xml
-.phpunit.result.cache
-###< phpunit/phpunit ###
+# Next.js (front-end)
+front-end/node_modules/
+front-end/.next/
+front-end/out/
+front-end/package-lock.json
 
-###> symfony/phpunit-bridge ###
-.phpunit.result.cache
-/phpunit.xml
-###< symfony/phpunit-bridge ###
+# Ignorer les fichiers générés par les IDE
+.idea/
+.vscode/
+*.swp
 
-###> symfony/asset-mapper ###
-/public/assets/
-/assets/vendor/
-###< symfony/asset-mapper ###
+# Ignorer les fichiers d'exécution
+*.pid
+*.seed
+*.pid.lock
