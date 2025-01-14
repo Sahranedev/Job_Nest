@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Dto\JobDto;
+use App\Enum\JobStatus;
 use App\Repository\ApplicationRepository;
 use App\Repository\JobRepository;
 use App\Repository\CompanyRepository;
@@ -14,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class JobController extends AbstractController
 {
-    #[Route('/job', name: 'app_job')]
+    #[Route(path: '/job', name: 'app_job')]
     public function index(): Response
     {
         return $this->render('job/index.html.twig', [
@@ -52,25 +54,77 @@ class JobController extends AbstractController
         return $this->json($job);
     }
 
-    #[Route('/jobs', name: 'create_job', methods: ['POST'])]
+    #[Route('/api/jobs', name: 'create_job', methods: ['POST'])]
     public function createJob(
         Request $request,
-        JobRepository $jobRepository,
         CompanyRepository $companyRepository,
         EntityManagerInterface $entityManager,
+        JobRepository $jobRepository,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
-
-        if (!isset($data['title'], $data['description'], $data['location'], $data['type'], $data['status'], $data['company_id'])) {
-            return new JsonResponse(['error' => 'Invalid data'], 400);
-        }
 
         try {
             $job = $jobRepository->createJob($data, $companyRepository, $entityManager);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
 
-        return new JsonResponse(['message' => 'Job créé avec succès !', 'job' => $job], 201);
+
+        $jobDto = new JobDto(
+            $job->getId(),
+            $job->getTitle(),
+            $job->getDescription(),
+            $job->getLocation(),
+            $job->getType()->value,
+            $job->getCompany()->getName(),
+        );
+
+        return $this->json($jobDto, Response::HTTP_CREATED);
+    }
+
+    #[Route('/api/jobs/{id}/status', name: 'update_job_status', methods: ['PATCH'])]
+    public function updateJobStatus(
+        int $id,
+        Request $request,
+        JobRepository $jobRepository,
+        EntityManagerInterface $entityManager,
+    ): JsonResponse {
+        $job = $jobRepository->find($id);
+
+        if (!$job) {
+            return new JsonResponse(['error' => 'Job not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['status'])) {
+            return new JsonResponse(['error' => 'Status is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $newStatus = JobStatus::from($data['status']);
+        } catch (\ValueError $e) {
+            return new JsonResponse(['error' => 'Invalid status'], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            switch ($newStatus) {
+                case JobStatus::PUBLISHED:
+                    $job->publish();
+                    break;
+                case JobStatus::CLOSED:
+                    $job->close();
+                    break;
+                case JobStatus::DRAFT:
+                    $job->draft();
+                    break;
+                default:
+                    throw new \Exception('Invalid status transition');
+            }
+            $entityManager->flush();
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+
+        return new JsonResponse(['message' => 'Job status updated successfully'], Response::HTTP_OK);
     }
 }

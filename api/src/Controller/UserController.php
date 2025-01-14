@@ -24,14 +24,7 @@ class UserController extends AbstractController
         $this->passwordHasher = $passwordHasher;
     }
 
-    public function findOneByEmail(string $email): ?User
-    {
-        return $this->user->createQueryBuilder('u')
-            ->andWhere('u.email = :email')
-            ->setParameter('email', $email)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
+
     // LISTE DES UTILISATEURS
     #[Route('/api/user', name: 'api_user', methods: ['GET'])]
     public function getCurrentUser(): JsonResponse
@@ -48,7 +41,6 @@ class UserController extends AbstractController
             'firstName' => $user->getFirstName(),
             'lastName' => $user->getLastName(),
             'roles' => $user->getRoles(),
-            // Ajoutez d'autres champs si nécessaires
         ]);
     }
 

@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 class Job
 {
@@ -94,24 +93,12 @@ class Job
 
     public function getType(): JobType
     {
-        return JobType::from($this->type); // Convertit la chaîne stockée en enum
+        return JobType::from($this->type);
     }
 
-    public function setType(JobType $type): self
+    public function setType(JobType $type): static
     {
-        $this->type = $type->value; // Stocke la valeur de l'enum en base
-        return $this;
-    }
-
-
-    public function getCompany(): ?Company
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?Company $company): static
-    {
-        $this->company = $company;
+        $this->type = $type->value;
 
         return $this;
     }
@@ -128,9 +115,42 @@ class Job
         return $this;
     }
 
-    /**
-     * @return Collection<int, Application>
-     */
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
     public function getApplications(): Collection
     {
         return $this->applications;
@@ -158,27 +178,27 @@ class Job
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function publish(): void
     {
-        return $this->createdAt;
+        if ($this->getStatus() !== JobStatus::DRAFT) {
+            throw new \Exception('Only draft jobs can be published.');
+        }
+        $this->setStatus(JobStatus::PUBLISHED);
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function close(): void
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
+        if ($this->getStatus() !== JobStatus::PUBLISHED) {
+            throw new \Exception('Only published jobs can be closed.');
+        }
+        $this->setStatus(JobStatus::CLOSED);
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function draft(): void
     {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
+        if ($this->getStatus() !== JobStatus::CLOSED) {
+            throw new \Exception('Only closed jobs can be drafted.');
+        }
+        $this->setStatus(JobStatus::DRAFT);
     }
 }

@@ -4,7 +4,10 @@ namespace App\Repository;
 
 use App\Entity\Company;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\UserRepository;
+use App\Entity\User;
 
 /**
  * @extends ServiceEntityRepository<Company>
@@ -16,28 +19,40 @@ class CompanyRepository extends ServiceEntityRepository
         parent::__construct($registry, Company::class);
     }
 
-    //    /**
-    //     * @return Company[] Returns an array of Company objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function getCompanies(): array
+    {
+        return $this->createQueryBuilder('company')
+            ->select('company.id, company.name, company.description, company.website')
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Company
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function createOneCompany(array $data, UserRepository $userRepository, EntityManagerInterface $entityManager): Company
+    {
+        // Vérification des données obligatoires
+        if (!isset($data['name'], $data['description'], $data['website'], $data['user_id'])) {
+            throw new \InvalidArgumentException('Invalid data');
+        }
+
+        // Récupération de l'utilisateur
+        $user = $userRepository->find($data['user_id']);
+        if (!$user) {
+            throw new \Exception('User not found');
+        }
+
+        // Création de l'entité Company
+        $company = new Company();
+        $company->setUser($user);
+        $company->setName($data['name']);
+        $company->setDescription($data['description']);
+        $company->setWebsite($data['website']);
+        $company->setCreatedAt(new \DateTimeImmutable());
+        $company->setUpdatedAt(new \DateTimeImmutable());
+
+        // Persistance de l'entité
+        $entityManager->persist($company);
+        $entityManager->flush();
+
+        return $company;
+    }
 }

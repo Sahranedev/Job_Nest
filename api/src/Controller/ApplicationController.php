@@ -6,6 +6,7 @@ use App\Entity\Application;
 use App\Repository\ApplicationRepository;
 use App\Repository\JobRepository;
 use App\Repository\UserRepository;
+use App\Service\MailerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,7 +24,7 @@ class ApplicationController extends AbstractController
         ]);
     }
 
-    #[Route('/api/user/{id}/applications', name: 'user_applications', methods: ['GET'])]
+    #[Route('/user/{id}/applications', name: 'user_applications', methods: ['GET'])]
     public function getApplicationsByUser(ApplicationRepository $applicationRepository, int $id): JsonResponse
     {
         $applications = $applicationRepository->findApplicationsByUserId($id);
@@ -44,6 +45,7 @@ class ApplicationController extends AbstractController
         JobRepository $jobRepository,
         UserRepository $userRepository,
         EntityManagerInterface $entityManager,
+        MailerService $mailerService,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
@@ -52,10 +54,18 @@ class ApplicationController extends AbstractController
         }
 
         try {
-            $applicationRepository->createApplication($data, $jobRepository, $userRepository, $entityManager);
+            $application = $applicationRepository->createApplication(
+                $data,
+                $jobRepository,
+                $userRepository,
+                $entityManager,
+            );
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 404);
         }
+
+        $mailerService->sendApplicationConfirmationToCandidate($application);
+        $mailerService->sendNewApplicationNotificationToCompany($application);
 
         return new JsonResponse(['message' => 'Candidature créee avec succès !'], 201);
     }

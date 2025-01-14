@@ -28,7 +28,7 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <UserProvider>
-            <div className="min-h-screen pb-14">{children}</div>
+            <div className="min-h-screen">{children}</div>
             {showNavbar && <BottomNav />}{" "}
           </UserProvider>
         </AuthProvider>

@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:api": "cd api && symfony serve --no-tls",
+    "start:frontend": "cd front-end && npm run dev",
+    "start": "npm run start:api & npm run start:frontend"
   },
   "author": "Sahrane",
   "license": "ISC"

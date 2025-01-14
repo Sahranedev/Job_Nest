@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Job;
+use App\Enum\JobStatus;
+use App\Enum\JobType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\CompanyRepository;
@@ -50,9 +52,9 @@ class JobRepository extends ServiceEntityRepository
         $job->setTitle($data['title']);
         $job->setDescription($data['description']);
         $job->setLocation($data['location']);
-        $job->setType($data['type']);
-        $job->setStatus($data['status']);
-        $job->setCompany($company);
+        $job->setType(JobType::from($data['type']));
+        $job->setStatus(JobStatus::DRAFT);
+        $job->setCompany(company: $company);
         $job->setCreatedAt(new \DateTimeImmutable());
 
         $entityManager->persist($job);

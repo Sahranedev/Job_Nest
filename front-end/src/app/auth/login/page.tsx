@@ -100,7 +100,11 @@ const LoginPage = () => {
       </p>
 
       <div className="flex justify-center mt-4">
-        <Button type="button" className=" w-56 rounded-full text-xl ">
+        <Button
+          type="button"
+          onClick={() => router.push("/auth/register")}
+          className=" w-56 rounded-full text-xl "
+        >
           S'inscrire
         </Button>
       </div>

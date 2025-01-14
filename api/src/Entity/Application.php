@@ -9,7 +9,6 @@ use ApiPlatform\Metadata\ApiResource;
 
 
 #[ORM\Entity(repositoryClass: ApplicationRepository::class)]
-#[ApiResource]
 class Application
 {
     #[ORM\Id]
