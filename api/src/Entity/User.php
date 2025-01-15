@@ -9,6 +9,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -56,6 +58,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Application::class)]
     private Collection $applications;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $cvPath = null;
+
+    #[Vich\UploadableField(mapping: 'user_cv', fileNameProperty: 'cvPath')]
+    private ?File $cvFile = null;
 
     public function __construct()
     {
@@ -152,12 +160,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRole(): UserRole
     {
-        return UserRole::from($this->role); // Convertit la chaîne en enum
+        return UserRole::from($this->role); // je converti la chaîne en enum
     }
 
     public function setRole(UserRole $role): self
     {
-        $this->role = $role->value; // Enregistre la valeur de l'enum dans la base
+        $this->role = $role->value; // j'enregistre la valeur de l'enum dans la base
         return $this;
     }
 
@@ -244,7 +252,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function addApplication(Application $application): static
     {
         if (!$this->applications->contains($application)) {
-            $this->applications->add($application);
+            $this->applications->add(element: $application);
             $application->setUser($this);
         }
 
@@ -261,5 +269,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    public function getCvPath(): ?string
+    {
+        return $this->cvPath;
+    }
+
+    public function setCvPath(?string $cvPath): static
+    {
+        $this->cvPath = $cvPath;
+
+        return $this;
+    }
+
+    public function setCvFile(?File $cvFile): void
+    {
+        $this->cvFile = $cvFile;
+
+        if ($cvFile) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+    public function getCvFile(): ?File
+    {
+        return $this->cvFile;
     }
 }

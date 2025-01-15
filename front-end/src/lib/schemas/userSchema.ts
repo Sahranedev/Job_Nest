@@ -28,3 +28,19 @@ export const registrationSchema = z
     message: "Les mots de passe ne correspondent pas.",
     path: ["confirmPassword"],
   });
+
+export const personalInfoSchema = z.object({
+  firstName: z.string().min(1, { message: "Le prénom est requis." }),
+  lastName: z.string().min(1, { message: "Le nom est requis." }),
+  email: z
+    .string()
+    .email({ message: "Veuillez entrer une adresse email valide." }),
+  phoneNumber: z
+    .string()
+    .min(10, { message: "Veuillez entrer un numéro de téléphone valide." }),
+  country: z.string().min(1, { message: "Le pays est requis." }),
+  city: z.string().min(1, { message: "La ville est requise." }),
+  password: z.string().optional(),
+  currentPassword: z.string().optional(),
+  newPassword: z.string().optional(),
+});

@@ -1,6 +1,7 @@
 "use client";
 
 import BottomNav from "./_components/BottomNav";
+import NavBar from "./_components/NavBar"; // Importer NavBar
 import { AuthProvider } from "./context/AuthContext";
 import { UserProvider } from "./context/UserContext";
 import { usePathname } from "next/navigation";
@@ -29,7 +30,16 @@ export default function RootLayout({
         <AuthProvider>
           <UserProvider>
             <div className="min-h-screen">{children}</div>
-            {showNavbar && <BottomNav />}{" "}
+            {showNavbar && (
+              <>
+                <div className="block md:hidden">
+                  <BottomNav />
+                </div>
+                <div className="hidden md:block">
+                  <NavBar />
+                </div>
+              </>
+            )}
           </UserProvider>
         </AuthProvider>
       </body>

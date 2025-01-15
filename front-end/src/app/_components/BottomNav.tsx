@@ -36,7 +36,7 @@ export default function BottomNav() {
         Candidatures
       </Link>
       <Link
-        href="#"
+        href="/candidates/profile"
         className="flex flex-col items-center justify-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary focus:text-primary"
         prefetch={false}
       >

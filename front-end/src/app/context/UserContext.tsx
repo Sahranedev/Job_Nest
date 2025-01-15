@@ -15,6 +15,8 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  city: string;
+  phoneNumber: string;
   roles: string[];
 }
 

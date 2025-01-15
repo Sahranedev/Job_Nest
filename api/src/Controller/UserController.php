@@ -40,6 +40,8 @@ class UserController extends AbstractController
             'email' => $user->getEmail(),
             'firstName' => $user->getFirstName(),
             'lastName' => $user->getLastName(),
+            'phoneNumber' => $user->getPhoneNumber(),
+            'city' => $user->getCity(),
             'roles' => $user->getRoles(),
         ]);
     }
@@ -92,4 +94,31 @@ class UserController extends AbstractController
 
         return new JsonResponse(['message' => 'Utilisateur créé avec succès'], Response::HTTP_CREATED);
     }
+
+    // UPLOAD DU CV
+    #[Route('/api/user/upload-cv', name: 'upload_cv', methods: ['POST'])]
+    public function uploadCv(Request $request, UserRepository $userRepository): JsonResponse
+    {
+        $user = $this->getUser(); // Récupère l'utilisateur connecté
+
+        if (!$user instanceof User) {
+            return new JsonResponse(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        // Récupérer le fichier depuis la requête
+        $file = $request->files->get('cvFile');
+
+        if (!$file) {
+            return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Associe le fichier à l'utilisateur via VichUploader
+        $user->setCvFile($file);
+
+        // Sauvegarder les modifications
+        $userRepository->save($user);
+
+        return new JsonResponse(['message' => 'CV uploaded successfully'], Response::HTTP_OK);
+    }
+
 }
