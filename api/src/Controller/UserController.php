@@ -71,7 +71,7 @@ class UserController extends AbstractController
     }
     // ENREGISTRER UN UTILISATEUR
     #[Route('/register', name: 'user_register', methods: ['POST'])]
-    public function register(Request $request): Response
+    public function register(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -90,6 +90,6 @@ class UserController extends AbstractController
 
         $this->userRepository->save($user);
 
-        return new Response('Utilisateur créé avec succès', Response::HTTP_CREATED);
+        return new JsonResponse(['message' => 'Utilisateur créé avec succès'], Response::HTTP_CREATED);
     }
 }

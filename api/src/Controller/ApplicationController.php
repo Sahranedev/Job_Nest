@@ -13,7 +13,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
+use App\Denormalizer\ApplicationDenormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
 class ApplicationController extends AbstractController
 {
     #[Route('/application', name: 'app_application')]
@@ -24,7 +25,7 @@ class ApplicationController extends AbstractController
         ]);
     }
 
-    #[Route('/user/{id}/applications', name: 'user_applications', methods: ['GET'])]
+    #[Route('api/user/{id}/applications', name: 'user_applications', methods: ['GET'])]
     public function getApplicationsByUser(ApplicationRepository $applicationRepository, int $id): JsonResponse
     {
         $applications = $applicationRepository->findApplicationsByUserId($id);
@@ -41,33 +42,28 @@ class ApplicationController extends AbstractController
     #[Route('/applications', name: 'create_application', methods: ['POST'])]
     public function createApplication(
         Request $request,
-        ApplicationRepository $applicationRepository,
-        JobRepository $jobRepository,
-        UserRepository $userRepository,
-        EntityManagerInterface $entityManager,
+        SerializerInterface $serializer,
         MailerService $mailerService,
+        EntityManagerInterface $entityManager,
     ): JsonResponse {
-        $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['job_id'], $data['user_id'])) {
-            return new JsonResponse(['error' => 'Invalid data'], 400);
-        }
 
         try {
-            $application = $applicationRepository->createApplication(
-                $data,
-                $jobRepository,
-                $userRepository,
-                $entityManager,
-            );
+            $application = $serializer->deserialize($request->getContent(), Application::class, 'json');
+
+            $entityManager->persist($application);
+            $entityManager->flush();
+
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
 
         $mailerService->sendApplicationConfirmationToCandidate($application);
         $mailerService->sendNewApplicationNotificationToCompany($application);
 
-        return new JsonResponse(['message' => 'Candidature créee avec succès !'], 201);
+
+
+        return $this->json(['message' => 'Candidature créee avec succès !'], Response::HTTP_CREATED);
     }
 
     #[Route('/user/{id}/applications-details', name: 'user_applications_with_jobs', methods: ['GET'])]

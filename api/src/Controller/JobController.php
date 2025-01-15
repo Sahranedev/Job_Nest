@@ -42,7 +42,7 @@ class JobController extends AbstractController
         return $this->json($jobs);
     }
 
-    #[Route('/job/{id}', name: 'job', methods: ['GET'])]
+    #[Route('api/job/{id}', name: 'job', methods: ['GET'])]
     public function getJobById(int $id, JobRepository $jobRepository): JsonResponse
     {
         $job = $jobRepository->getJobById($id);

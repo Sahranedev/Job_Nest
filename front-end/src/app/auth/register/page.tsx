@@ -14,10 +14,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type RegistrationFormValues = z.infer<typeof registrationSchema>;
 
 export default function RegisterPage() {
+  const router = useRouter();
   const form = useForm<RegistrationFormValues>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
@@ -30,13 +40,33 @@ export default function RegisterPage() {
       city: "",
       address: "",
       age: undefined,
-      role: "ROLE_USER",
+      role: "CANDIDATE",
     },
   });
 
   const onSubmit = async (values: RegistrationFormValues) => {
-    console.log("Form submitted:", values);
-    // Logique pour envoyer les données au backend
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erreur: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("Utilisateur enregistré avec succès:", data);
+      router.push("/auth/login");
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement:", error);
+    }
   };
 
   return (
@@ -47,6 +77,7 @@ export default function RegisterPage() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-4 w-full"
         >
+          {/* Email */}
           <FormField
             control={form.control}
             name="email"
@@ -60,6 +91,7 @@ export default function RegisterPage() {
               </FormItem>
             )}
           />
+          {/* Mot de passe */}
           <FormField
             control={form.control}
             name="password"
@@ -94,6 +126,7 @@ export default function RegisterPage() {
               </FormItem>
             )}
           />
+          {/* Prénom */}
           <FormField
             control={form.control}
             name="firstName"
@@ -107,6 +140,7 @@ export default function RegisterPage() {
               </FormItem>
             )}
           />
+          {/* Nom */}
           <FormField
             control={form.control}
             name="lastName"
@@ -120,12 +154,13 @@ export default function RegisterPage() {
               </FormItem>
             )}
           />
+          {/* Numéro de téléphone */}
           <FormField
             control={form.control}
             name="phoneNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Téléphone</FormLabel>
+                <FormLabel>Numéro de téléphone</FormLabel>
                 <FormControl>
                   <Input placeholder="Votre numéro de téléphone" {...field} />
                 </FormControl>
@@ -133,6 +168,7 @@ export default function RegisterPage() {
               </FormItem>
             )}
           />
+          {/* Ville */}
           <FormField
             control={form.control}
             name="city"
@@ -146,6 +182,7 @@ export default function RegisterPage() {
               </FormItem>
             )}
           />
+          {/* Adresse */}
           <FormField
             control={form.control}
             name="address"
@@ -159,12 +196,62 @@ export default function RegisterPage() {
               </FormItem>
             )}
           />
+          {/* Âge */}
+          <FormField
+            control={form.control}
+            name="age"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Âge</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Votre âge"
+                    type="number"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Rôle */}
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Rôle</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisissez un rôle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="CANDIDATE">Candidat</SelectItem>
+                      <SelectItem value="RECRUITER">Recruteur</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <Button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2"
+            className="w-full bg-gray-700 hover:bg-gray-400 text-white rounded-lg py-2"
           >
             S'inscrire
           </Button>
+          <p className="text-center">
+            Déjà un compte ?{" "}
+            <Link href="/auth/login" className="text-gray-500 hover:underline">
+              Se connecter
+            </Link>
+          </p>
         </form>
       </Form>
     </div>

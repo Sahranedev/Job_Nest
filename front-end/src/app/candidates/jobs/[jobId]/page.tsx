@@ -21,7 +21,13 @@ const JobDetailsPage = () => {
     const fetchJobDetails = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/job/${jobId}`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/job/${jobId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         if (!res.ok) {
           throw new Error("Erreur lors de la récupération des détails du job");
@@ -54,7 +60,7 @@ const JobDetailsPage = () => {
   const applyForJob = async () => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/applications`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/applications`,
         {
           method: "POST",
           headers: {

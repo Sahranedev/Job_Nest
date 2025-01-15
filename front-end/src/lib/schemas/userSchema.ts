@@ -20,11 +20,9 @@ export const registrationSchema = z
       .number()
       .min(0, { message: "L'âge doit être un nombre positif." })
       .optional(),
-    role: z
-      .string()
-      .refine((role) => ["ROLE_USER", "ROLE_ADMIN"].includes(role), {
-        message: "Le rôle n'est pas valide.",
-      }),
+    role: z.enum(["CANDIDATE", "RECRUITER", "ADMIN"], {
+      message: "Veuillez choisir un rôle valide.",
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Les mots de passe ne correspondent pas.",
