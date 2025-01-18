@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Denormalizer\ApplicationDenormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use IntlDateFormatter;
+
 class ApplicationController extends AbstractController
 {
     #[Route('/application', name: 'app_application')]
@@ -72,7 +74,27 @@ class ApplicationController extends AbstractController
         ApplicationRepository $applicationRepository,
     ): JsonResponse {
         $applications = $applicationRepository->findApplicationsWithJobDetailsByUserId($id);
+
+        // Format the date for each application
+        foreach ($applications as &$application) {
+            $application['createdAt'] = $this->formatDate($application['createdAt']);
+        }
+
         return $this->json($applications);
+    }
+
+    private function formatDate(\DateTimeImmutable $date): string
+    {
+        $formatter = new IntlDateFormatter(
+            'fr_FR',
+            IntlDateFormatter::SHORT,
+            IntlDateFormatter::NONE,
+            'Europe/Paris',
+            IntlDateFormatter::GREGORIAN,
+            'dd/MM/yyyy',
+        );
+
+        return $formatter->format($date);
     }
 
     #[Route('/user/{userId}/application/{applicationId}', name: 'delete_user_applications', methods: ['DELETE'])]

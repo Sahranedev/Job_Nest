@@ -13,6 +13,7 @@ const AlertResume: React.FC<ApplyComponentProps> = ({
 }) => {
   return (
     <div>
+      <p className="text-xs text-gray-400">{application.createdAt}</p>
       <p>{application.title}</p>
     </div>
   );
