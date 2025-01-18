@@ -4,8 +4,29 @@ import { useUser } from "../../context/UserContext";
 import { useAuth } from "../../context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import PersonalInfoForm from "@/app/_components/PersonalInfoForm"; // Importer le composant
-import PersonnalCv from "@/app/_components/PersonnalCv"; // Importer le composant
+import PersonalInfoForm from "@/app/_components/PersonalInfoForm";
+import PersonnalCv from "@/app/_components/PersonnalCv";
+
+interface ClickableBlockProps {
+  label: string;
+  onClick: () => void;
+  isSelected: boolean;
+}
+
+const ClickableBlock: React.FC<ClickableBlockProps> = ({
+  label,
+  onClick,
+  isSelected,
+}) => (
+  <div
+    className={`bg-white p-4 shadow-md rounded-lg transition-transform duration-500 hover:border hover:border-slate-500 hover:bg-gray-100/50 hover:scale-95 ${
+      isSelected ? "h-24" : "h-48"
+    } border border-slate-100 cursor-pointer`}
+    onClick={onClick}
+  >
+    <p>{label}</p>
+  </div>
+);
 
 const ProfilePage = () => {
   const { token, isAuthenticated } = useAuth();
@@ -50,62 +71,36 @@ const ProfilePage = () => {
         <div className="md:w-2/3">
           {!selectedBlock ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div
-                className="bg-white p-4 shadow-md rounded-lg h-48 border border-slate-100 cursor-pointer"
-                onClick={() => handleBlockClick("Ma recherche")}
-              >
-                <p>Ma recherche</p>
-              </div>
-              <div
-                className="bg-white p-4 shadow-md rounded-lg h-48 border border-slate-100 cursor-pointer"
-                onClick={() => handleBlockClick("Ma situation actuelle")}
-              >
-                <p>Ma situation actuelle</p>
-              </div>
-              <div
-                className="bg-white p-4 shadow-md rounded-lg h-48 border border-slate-100 cursor-pointer"
-                onClick={() => handleBlockClick("Mes CV")}
-              >
-                <p>Mes CV</p>
-              </div>
-              <div
-                className="bg-white p-4 shadow-md rounded-lg h-48 border border-slate-100 cursor-pointer"
-                onClick={() =>
-                  handleBlockClick("Mes informations personnelles")
-                }
-              >
-                <p>Mes informations personnelles</p>
-              </div>
+              {[
+                "Ma recherche",
+                "Ma situation actuelle",
+                "Mes CV",
+                "Mes informations personnelles",
+              ].map((label) => (
+                <ClickableBlock
+                  key={label}
+                  label={label}
+                  onClick={() => handleBlockClick(label)}
+                  isSelected={false}
+                />
+              ))}
             </div>
           ) : (
             <>
               <div className="grid grid-cols-4 gap-6">
-                <div
-                  className="bg-white p-4 shadow-md rounded-lg h-24 border border-slate-100 cursor-pointer"
-                  onClick={() => handleBlockClick("Ma recherche")}
-                >
-                  <p>Ma recherche</p>
-                </div>
-                <div
-                  className="bg-white p-4 shadow-md rounded-lg h-24 border border-slate-100 cursor-pointer"
-                  onClick={() => handleBlockClick("Ma situation actuelle")}
-                >
-                  <p>Ma situation actuelle</p>
-                </div>
-                <div
-                  className="bg-white p-4 shadow-md rounded-lg h-24 border border-slate-100 cursor-pointer"
-                  onClick={() => handleBlockClick("Mes CV")}
-                >
-                  <p>Mes CV</p>
-                </div>
-                <div
-                  className="bg-white p-4 shadow-md rounded-lg h-24 border border-slate-100 cursor-pointer"
-                  onClick={() =>
-                    handleBlockClick("Mes informations personnelles")
-                  }
-                >
-                  <p>Mes informations personnelles</p>
-                </div>
+                {[
+                  "Ma recherche",
+                  "Ma situation actuelle",
+                  "Mes CV",
+                  "Mes informations personnelles",
+                ].map((label) => (
+                  <ClickableBlock
+                    key={label}
+                    label={label}
+                    onClick={() => handleBlockClick(label)}
+                    isSelected={true}
+                  />
+                ))}
               </div>
               <div className="bg-white p-4 shadow-md rounded-lg mt-6 border border-slate-300">
                 <h2 className="text-xl font-bold mb-4">{selectedBlock}</h2>

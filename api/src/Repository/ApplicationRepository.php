@@ -54,7 +54,7 @@ class ApplicationRepository extends ServiceEntityRepository
             ->innerJoin('app.job', 'job') // Jointure avec l'entité Job
             ->andWhere('app.user = :userId') // Condition pour filtrer les candidatures de l'utilisateur
             ->setParameter('userId', $userId) // Paramètre utilisateur
-            ->select('app.id, app.cover_letter, app.createdAt, job.id AS job_id, job.title, job.location, job.type, job.status') // Colonnes à récupérer
+            ->select('app.id, app.cover_letter, app.createdAt, job.id AS job_id, job.title, job.location, job.type, job.status, app.resume_path') // Colonnes à récupérer
             ->getQuery()
             ->getResult();
     }

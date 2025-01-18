@@ -1,9 +1,10 @@
 export interface Application {
   id: number;
   userId: number;
-  jobId: number;
+  job_id: number;
+  title: string;
   coverLetter?: string;
-  resumePath?: string;
+  resume_path?: string;
   createdAt: string;
   updatedAt?: string;
 }

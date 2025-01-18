@@ -29,6 +29,15 @@ export const registrationSchema = z
     path: ["confirmPassword"],
   });
 
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .email({ message: "Veuillez entrer une adresse email valide." }),
+  password: z.string().min(8, {
+    message: "Le mot de passe doit comporter au moins 8 caractères.",
+  }),
+});
+
 export const personalInfoSchema = z.object({
   firstName: z.string().min(1, { message: "Le prénom est requis." }),
   lastName: z.string().min(1, { message: "Le nom est requis." }),

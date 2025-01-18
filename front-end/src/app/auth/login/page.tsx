@@ -5,17 +5,35 @@ import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import Lottie from "react-lottie";
+import animationData from "../../../../public/lottie/job_animation.json";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { loginSchema } from "@/lib/schemas/userSchema";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useAuth();
-
   const router = useRouter();
+  type LoginFormValues = z.infer<typeof loginSchema>;
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const handleLogin = async (values: LoginFormValues) => {
     setError("");
 
     try {
@@ -26,7 +44,10 @@ const LoginPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username: email, password }),
+          body: JSON.stringify({
+            username: values.email,
+            password: values.password,
+          }),
         }
       );
 
@@ -51,67 +72,79 @@ const LoginPage = () => {
     }
   };
 
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
   return (
-    <div className="bg-gray-600 min-h-screen">
-      <div className="flex justify-center pt-20 pb-10">
-        <p className="text-2xl text-white">LOGO</p>
-      </div>
-      <div className="flex flex-col justify-center items-center text-white text-2xl">
-        Se connecter
-        <form
-          onSubmit={handleLogin}
-          className="w-80 mt-6 text-black flex flex-col gap-6"
-        >
-          <InputLogin
-            placeholder="Adresse Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+    <div className="flex">
+      {/* BLOC DE GAUCHE */}
+      <div className="min-h-screen w-1/2 flex items-center justify-center bg-[#2C2638]">
+        <div className="bg-violet-200/50 h-5/6 w-5/6 flex items-center justify-center rounded-md">
+          {/* ANIMATION LOTTIE */}
+          <Lottie
+            options={defaultOptions}
+            height="100%"
+            width="100%"
+            speed={1}
           />
-          <InputLogin
-            placeholder="Mot de passe"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <div className="flex justify-center">
-            <Button type="submit" className="mt-2 w-56 rounded-full text-xl">
-              Connexion
-            </Button>
-          </div>
-        </form>
-        <p className="text-red-600 text-sm mt-4">{error}</p>
+        </div>
       </div>
-      <p className="mx-auto text-center text-white underline underline-offset-4 mt-6">
-        Mot de passe oublié ?
-      </p>
-
-      <div className="flex justify-center">
-        <div className=" mt-8 w-80 border-t border-gray-300"></div>
+      {/* BLOC DE DROITE */}
+      <div className="w-1/2 flex flex-col justify-center items-center bg-[#2C2638]">
+        <h1 className="text-4xl font-bold text-white">Se connecter</h1>
+        <div className="w-1/2 ">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleLogin)}
+              className="flex flex-col gap-4 w-full mt-10"
+            >
+              {/* Email */}
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <InputLogin placeholder="Email" type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* Mot de passe */}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <InputLogin
+                        placeholder="Mot de passe"
+                        type="password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                className="w-full bg-[#6D54B5] hover:bg-gray-400 text-white rounded-lg py-6"
+              >
+                Se connecter
+              </Button>
+              {error && <p className="text-red-500">{error}</p>}
+            </form>
+          </Form>
+        </div>
       </div>
-      <h3 className="text-white font-bold text-2xl text-center mt-4">
-        Nouveau Membre
-      </h3>
-      <p className="text-center mt-2 text-white">
-        Vous êtes élève ou professeur ?
-      </p>
-      <p className="text-center text-white ">
-        Créer votre espace membre pour acceder à toute l'application
-      </p>
-
-      <div className="flex justify-center mt-4">
-        <Button
-          type="button"
-          onClick={() => router.push("/auth/register")}
-          className=" w-56 rounded-full text-xl "
-        >
-          S'inscrire
-        </Button>
-      </div>
-      <footer className="mt-24 text-white">
-        <p className="text-center">Job Office</p>
-        <p className="text-center">Mention Légal/FAQ</p>
-      </footer>
     </div>
   );
 };

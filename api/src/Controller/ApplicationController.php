@@ -66,7 +66,7 @@ class ApplicationController extends AbstractController
         return $this->json(['message' => 'Candidature créee avec succès !'], Response::HTTP_CREATED);
     }
 
-    #[Route('/user/{id}/applications-details', name: 'user_applications_with_jobs', methods: ['GET'])]
+    #[Route('/api/user/{id}/applications-details', name: 'user_applications_with_jobs', methods: ['GET'])]
     public function getApplicationDetailsByUser(
         int $id,
         ApplicationRepository $applicationRepository,

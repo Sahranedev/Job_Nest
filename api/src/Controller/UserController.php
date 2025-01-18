@@ -25,7 +25,7 @@ class UserController extends AbstractController
     }
 
 
-    // LISTE DES UTILISATEURS
+    // Récupère l'utilsateur connecté
     #[Route('/api/user', name: 'api_user', methods: ['GET'])]
     public function getCurrentUser(): JsonResponse
     {
@@ -45,6 +45,32 @@ class UserController extends AbstractController
             'roles' => $user->getRoles(),
         ]);
     }
+    #[Route('/users', name: 'api_users', methods: ['GET'])]
+    public function getAllUsers(): JsonResponse
+    {
+        $users = $this->userRepository->findAll();
+
+        $data = [];
+
+        foreach ($users as $user) {
+            $data[] = [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'firstName' => $user->getFirstName(),
+                'lastName' => $user->getLastName(),
+                'phoneNumber' => $user->getPhoneNumber(),
+                'city' => $user->getCity(),
+                'address' => $user->getAddress(),
+                'age' => $user->getAge(),
+                'role' => $user->getRole(),
+                'createdAt' => $user->getCreatedAt(),
+                'updatedAt' => $user->getUpdatedAt(),
+            ];
+        }
+
+        return $this->json($data);
+    }
+
 
     // RECUPERER UN UTILISATEUR PAR SON ID
     #[Route('/api/user/{id}', name: 'api_user_by_id', methods: ['GET'])]

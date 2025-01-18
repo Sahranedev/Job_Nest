@@ -244,7 +244,7 @@ export default function RegisterPage() {
             type="submit"
             className="w-full bg-gray-700 hover:bg-gray-400 text-white rounded-lg py-2"
           >
-            S'inscrire
+            S&apos;inscrire
           </Button>
           <p className="text-center">
             Déjà un compte ?{" "}
