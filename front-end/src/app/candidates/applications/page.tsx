@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Job } from "@/interfaces/Job";
 import { useUser } from "../../context/UserContext";
 import { useAuth } from "../../context/AuthContext";
-import JobCard from "@/app/_components/JobCard";
+import JobCard from "@/app/_components/Job/JobCard";
 
 const CandidatesApplicationsPage = () => {
   const { token, isAuthenticated } = useAuth();

@@ -33,7 +33,7 @@ class JobRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('job')
             ->innerJoin('job.company', 'company')
-            ->select('job.id, job.title, job.description, job.location, job.type, job.status, company.name AS company_name', 'company.id AS company_id')
+            ->select('job.id, job.title, job.description, job.location, job.type, job.status, company.name AS company_name', 'company.id AS company_id, job.createdAt')
             ->andWhere('job.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
@@ -62,4 +62,27 @@ class JobRepository extends ServiceEntityRepository
 
         return $job;
     }
+
+    public function searchJobs(?string $title, ?string $location): array
+    {
+        $qb = $this->createQueryBuilder('job')
+            ->innerJoin('job.company', 'company')
+            ->select('job.id, job.title, job.description, job.location, job.type, job.status, company.name AS company_name', 'company.id AS company_id');
+
+        if ($title) {
+            $qb->andWhere('job.title LIKE :title')
+                ->setParameter('title', '%' . $title . '%');
+        }
+
+        if ($location) {
+            $qb->andWhere('job.location LIKE :location')
+                ->setParameter('location', '%' . $location . '%');
+        }
+
+        error_log('Requête SQL : ' . $qb->getQuery()->getSQL());
+        error_log('Paramètres : ' . json_encode($qb->getParameters()));
+
+        return $qb->getQuery()->getResult();
+    }
+
 }

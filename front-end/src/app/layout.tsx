@@ -1,7 +1,7 @@
 "use client";
 
-import BottomNav from "./_components/BottomNav";
-import NavBar from "./_components/NavBar"; // Importer NavBar
+import BottomNav from "./_components/Navigation/BottomNav";
+import NavBar from "./_components/Navigation/NavBar";
 import { AuthProvider } from "./context/AuthContext";
 import { UserProvider } from "./context/UserContext";
 import { usePathname } from "next/navigation";
@@ -21,7 +21,7 @@ export default function RootLayout({
     "/auth/forgot-password",
   ];
 
-  // Affiche la navbar uniquement si le chemin actuel n'est pas dans hideNavbarRoutes
+  // j'affiche la navbar uniquement si le chemin actuel n'est pas dans hideNavbarRoutes
   const showNavbar = !hideNavbarRoutes.includes(pathname);
 
   return (

@@ -10,14 +10,12 @@ export default function HomePage() {
 
   useEffect(() => {
     if (user) {
-      // Redirection basée sur le rôle
       if (user.roles.includes("ROLE_CANDIDATE")) {
         router.push("/candidates");
       } else if (user.roles.includes("ROLE_RECRUITER")) {
         router.push("/recruiters");
       }
     } else {
-      // Redirige vers la connexion si non connecté
       router.push("/auth/login");
     }
   }, [user, router]);

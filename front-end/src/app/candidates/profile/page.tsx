@@ -4,8 +4,8 @@ import { useUser } from "../../context/UserContext";
 import { useAuth } from "../../context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import PersonalInfoForm from "@/app/_components/PersonalInfoForm";
-import PersonnalCv from "@/app/_components/PersonnalCv";
+import PersonalInfoForm from "@/app/_components/Mon-profil/PersonalInfoForm";
+import PersonnalCv from "@/app/_components/Mon-profil/PersonnalCv";
 
 interface ClickableBlockProps {
   label: string;

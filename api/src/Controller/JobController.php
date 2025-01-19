@@ -9,10 +9,11 @@ use App\Repository\JobRepository;
 use App\Repository\CompanyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\DateFormatterService;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class JobController extends AbstractController
 {
@@ -43,13 +44,16 @@ class JobController extends AbstractController
     }
 
     #[Route('api/job/{id}', name: 'job', methods: ['GET'])]
-    public function getJobById(int $id, JobRepository $jobRepository): JsonResponse
+    public function getJobById(int $id, JobRepository $jobRepository, DateFormatterService $dateFormatterService): JsonResponse
     {
         $job = $jobRepository->getJobById($id);
 
         if (!$job) {
             return new JsonResponse(['error' => 'Job not found'], Response::HTTP_NOT_FOUND);
         }
+
+        // Formater la date avant de retourner la réponse
+        $job['createdAt'] = $dateFormatterService->formatDate($job['createdAt']);
 
         return $this->json($job);
     }
@@ -127,4 +131,31 @@ class JobController extends AbstractController
 
         return new JsonResponse(['message' => 'Job status updated successfully'], Response::HTTP_OK);
     }
+
+    #[Route('/api/jobs/search', name: 'search_jobs', methods: ['GET'])]
+    public function searchJobs(Request $request, JobRepository $jobRepository): JsonResponse
+    {
+        // Récupération des paramètres de recherche depuis la requête
+        $title = $request->query->get('title');
+        $location = $request->query->get('location');
+
+        // Vérification qu'au moins un des deux paramètres est fourni
+        if (!$title && !$location) {
+            return new JsonResponse(
+                ['error' => 'At least one search parameter (title or location) must be provided.'],
+                Response::HTTP_BAD_REQUEST,
+            );
+        }
+
+        // Appel au repository pour effectuer la recherche
+        $jobs = $jobRepository->searchJobs($title, $location);
+
+
+        // Retourne une réponse formatée
+        return $this->json([
+            'count' => count($jobs),
+            'results' => $jobs,
+        ]);
+    }
+
 }

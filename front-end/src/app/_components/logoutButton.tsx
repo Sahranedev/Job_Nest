@@ -1,20 +1,25 @@
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 
-const LogoutButton = () => {
+interface LogoutButtonProps {
+  className?: string;
+}
+
+const LogoutButton = ({ className, ...props }: LogoutButtonProps) => {
   const router = useRouter();
   const { logout } = useAuth();
 
   const handleLogout = () => {
     localStorage.clear();
-
     logout();
-
     router.push("/auth/login");
   };
 
-  return <Button onClick={handleLogout}>Logout</Button>;
+  return (
+    <button onClick={handleLogout} className={className} {...props}>
+      Se déconnecter
+    </button>
+  );
 };
 
 export default LogoutButton;

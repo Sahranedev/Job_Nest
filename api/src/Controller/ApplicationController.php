@@ -15,10 +15,20 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Denormalizer\ApplicationDenormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
-use IntlDateFormatter;
+use App\Service\DateFormatterService;
+
 
 class ApplicationController extends AbstractController
 {
+
+    private DateFormatterService $dateFormatter;
+
+    public function __construct(DateFormatterService $dateFormatter)
+    {
+        $this->dateFormatter = $dateFormatter;
+    }
+
+
     #[Route('/application', name: 'app_application')]
     public function index(): Response
     {
@@ -41,7 +51,7 @@ class ApplicationController extends AbstractController
         return $this->json($applications);
     }
 
-    #[Route('/applications', name: 'create_application', methods: ['POST'])]
+    #[Route('/api/applications', name: 'create_application', methods: ['POST'])]
     public function createApplication(
         Request $request,
         SerializerInterface $serializer,
@@ -75,27 +85,14 @@ class ApplicationController extends AbstractController
     ): JsonResponse {
         $applications = $applicationRepository->findApplicationsWithJobDetailsByUserId($id);
 
-        // Format the date for each application
         foreach ($applications as &$application) {
-            $application['createdAt'] = $this->formatDate($application['createdAt']);
+            $application['createdAt'] = $this->dateFormatter->formatDate($application['createdAt']);
         }
 
         return $this->json($applications);
     }
 
-    private function formatDate(\DateTimeImmutable $date): string
-    {
-        $formatter = new IntlDateFormatter(
-            'fr_FR',
-            IntlDateFormatter::SHORT,
-            IntlDateFormatter::NONE,
-            'Europe/Paris',
-            IntlDateFormatter::GREGORIAN,
-            'dd/MM/yyyy',
-        );
 
-        return $formatter->format($date);
-    }
 
     #[Route('/user/{userId}/application/{applicationId}', name: 'delete_user_applications', methods: ['DELETE'])]
     public function deleteUserApplication(int $applicationId, int $userId, ApplicationRepository $applicationRepository): JsonResponse
