@@ -11,17 +11,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Psr\Log\LoggerInterface;
 
 
 class UserController extends AbstractController
 {
     private $userRepository;
     private $passwordHasher;
+    private $logger;
 
-    public function __construct(UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher)
+    public function __construct(UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher, LoggerInterface $logger)
     {
         $this->userRepository = $userRepository;
         $this->passwordHasher = $passwordHasher;
+        $this->logger = $logger;
     }
 
 
@@ -122,29 +125,40 @@ class UserController extends AbstractController
     }
 
     // UPLOAD DU CV
-    #[Route('/api/user/upload-cv', name: 'upload_cv', methods: ['POST'])]
+
+    #[Route('/api/upload-cv', name: 'user_upload_cv', methods: ['POST'])]
     public function uploadCv(Request $request, UserRepository $userRepository): JsonResponse
     {
         $user = $this->getUser(); // Récupère l'utilisateur connecté
-
-        if (!$user instanceof User) {
-            return new JsonResponse(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
-        }
-
-        // Récupérer le fichier depuis la requête
-        $file = $request->files->get('cvFile');
+        $file = $request->files->get('cv'); // Récupère le fichier uploadé
 
         if (!$file) {
-            return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
+            $this->logger->error('Aucun fichier fourni');
+            return new JsonResponse(['error' => 'Aucun fichier fourni'], 400);
         }
 
-        // Associe le fichier à l'utilisateur via VichUploader
+        $this->logger->info('Fichier reçu', ['filename' => $file->getClientOriginalName()]);
+
         $user->setCvFile($file);
 
-        // Sauvegarder les modifications
+        // Ajoute le debugging ici :
+        $this->logger->debug('CvFile après setCvFile:', [
+            'cv_file' => $user->getCvFile(),
+            'cv_path' => $user->getCvPath(),
+        ]);
+
         $userRepository->save($user);
 
-        return new JsonResponse(['message' => 'CV uploaded successfully'], Response::HTTP_OK);
+        if ($user->getCvPath() === null) {
+            $this->logger->error('Le fichier n\'a pas été traité correctement');
+            return $this->json(['error' => 'Le fichier n\'a pas été traité correctement'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->logger->info('CV uploadé avec succès', ['cvPath' => $user->getCvPath()]);
+
+        return $this->json(['message' => 'CV uploadé avec succès'], Response::HTTP_CREATED);
     }
+
+
 
 }

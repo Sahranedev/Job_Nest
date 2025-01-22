@@ -135,11 +135,9 @@ class JobController extends AbstractController
     #[Route('/api/jobs/search', name: 'search_jobs', methods: ['GET'])]
     public function searchJobs(Request $request, JobRepository $jobRepository): JsonResponse
     {
-        // Récupération des paramètres de recherche depuis la requête
         $title = $request->query->get('title');
         $location = $request->query->get('location');
 
-        // Vérification qu'au moins un des deux paramètres est fourni
         if (!$title && !$location) {
             return new JsonResponse(
                 ['error' => 'At least one search parameter (title or location) must be provided.'],
@@ -147,11 +145,10 @@ class JobController extends AbstractController
             );
         }
 
-        // Appel au repository pour effectuer la recherche
         $jobs = $jobRepository->searchJobs($title, $location);
 
 
-        // Retourne une réponse formatée
+
         return $this->json([
             'count' => count($jobs),
             'results' => $jobs,

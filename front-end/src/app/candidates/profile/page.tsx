@@ -39,7 +39,6 @@ const ProfilePage = () => {
 
   return (
     <div className="container mx-auto p-4 mt-20">
-      {/* HEADER DATA */}
       <div className="flex flex-col md:flex-row gap-6">
         <div className="md:w-1/3 bg-white p-4 shadow-md rounded-lg border border-slate-300 h-auto md:h-full">
           <div className="flex items-center gap-6">
@@ -108,7 +107,6 @@ const ProfilePage = () => {
                   <PersonalInfoForm />
                 )}
                 {selectedBlock === "Mes CV" && <PersonnalCv />}
-                {/* Ajouter d'autres composants dynamiques ici */}
               </div>
             </>
           )}

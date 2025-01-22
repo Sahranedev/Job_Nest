@@ -11,8 +11,10 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[Vich\Uploadable]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -60,10 +62,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $applications;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $cvPath = null;
+    private ?string $cv_path = null;
 
-    #[Vich\UploadableField(mapping: 'user_cv', fileNameProperty: 'cvPath')]
-    private ?File $cvFile = null;
+    #[Vich\UploadableField(mapping: 'user_cv', fileNameProperty: 'cv_path')]
+    private ?File $cv_file = null;
 
     public function __construct()
     {
@@ -236,10 +238,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return ['ROLE_' . strtoupper($this->role)];
     }
 
-    public function eraseCredentials()
-    {
-        // Si des données sensibles sont stockées temporairement, les effacer ici
-    }
+    public function eraseCredentials() {}
 
     /**
      * @return Collection<int, Application>
@@ -273,26 +272,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getCvPath(): ?string
     {
-        return $this->cvPath;
+        return $this->cv_path;
     }
 
     public function setCvPath(?string $cvPath): static
     {
-        $this->cvPath = $cvPath;
+        $this->cv_path = $cvPath;
 
         return $this;
     }
 
     public function setCvFile(?File $cvFile): void
     {
-        $this->cvFile = $cvFile;
+        $this->cv_file = $cvFile;
 
         if ($cvFile) {
-            $this->updatedAt = new \DateTimeImmutable();
+            $this->updatedAt = new \DateTimeImmutable(); // Important pour Doctrine
         }
     }
+
     public function getCvFile(): ?File
     {
-        return $this->cvFile;
+        return $this->cv_file;
     }
 }

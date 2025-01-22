@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repository;
 
 use App\Entity\User;
@@ -22,5 +23,13 @@ class UserRepository extends ServiceEntityRepository
     public function findOneById(int $id): ?User
     {
         return $this->find($id);
+    }
+
+    public function updateCvPath(User $user, string $cvPath): void
+    {
+        $user->setCvPath($cvPath);
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
     }
 }

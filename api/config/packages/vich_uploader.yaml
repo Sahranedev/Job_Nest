@@ -1,5 +1,9 @@
 vich_uploader:
   db_driver: orm
+
+  metadata:
+    type: attribute
+
   mappings:
     user_cv:
       uri_prefix: /uploads/cv
