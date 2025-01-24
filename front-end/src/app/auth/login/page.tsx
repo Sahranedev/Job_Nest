@@ -2,10 +2,12 @@
 
 import { InputLogin } from "@/components/ui/input";
 import { useAuth } from "../../context/AuthContext";
+import { useUser } from "../../context/UserContext";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Lottie from "react-lottie";
+import { toast, Bounce } from "react-toastify";
 import animationData from "../../../../public/lottie/job_animation.json";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +24,7 @@ import {
 const LoginPage = () => {
   const [error, setError] = useState("");
   const { login } = useAuth();
+  const { user } = useUser();
   const router = useRouter();
   type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -59,13 +62,30 @@ const LoginPage = () => {
       const data = await response.json();
       const token = data.token;
 
-      // Stocker le token dans le localStorage
       localStorage.setItem("token", token);
 
-      // Appeler la fonction login pour mettre à jour l'état d'authentification
       login(token);
 
-      // Rediriger l'utilisateur après une connexion réussie
+      toast.success(
+        () => (
+          <div>
+            Hello {user?.firstName} 👋 , bienvenue sur{" "}
+            <span className="font-bold">Job Nest</span>
+          </div>
+        ),
+        {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        }
+      );
+
       router.push("/");
     } catch (error) {
       setError((error as Error).message);

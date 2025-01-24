@@ -26,7 +26,7 @@ class CompanyController extends AbstractController
     public function getCompanies(CompanyRepository $companyRepository): Response
     {
         $companies = $companyRepository->getCompanies();
-        return new JsonResponse($companies);
+        return $this->json($companies);
     }
 
     #[Route('/api/companies', name: 'create_company', methods: ['POST'])]
@@ -41,7 +41,7 @@ class CompanyController extends AbstractController
         try {
             $company = $companyRepository->createOneCompany($data, $userRepository, $entityManager);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 400);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
 
         return new JsonResponse(['message' => 'Entreprise créée avec succès !', 'company' => $company->getId()], 201);

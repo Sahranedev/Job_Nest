@@ -49,7 +49,7 @@ class JobController extends AbstractController
         $job = $jobRepository->getJobById($id);
 
         if (!$job) {
-            return new JsonResponse(['error' => 'Job not found'], Response::HTTP_NOT_FOUND);
+            return $this->json(['error' => 'Job not found'], Response::HTTP_NOT_FOUND);
         }
 
         // Formater la date avant de retourner la réponse

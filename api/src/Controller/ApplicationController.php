@@ -100,12 +100,12 @@ class ApplicationController extends AbstractController
         $application = $applicationRepository->find($applicationId);
 
         if (!$application) {
-            return new JsonResponse(['error' => 'Candidature non trouvée'], 404);
+            return $this->json(['error' => 'Candidature non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
         $applicationRepository->deleteUserApplicationById($userId, $applicationId);
 
-        return new JsonResponse(['message' => 'Candidature supprimée avec succès']);
+        return $this->json(['message' => 'Candidature supprimée avec succès']);
     }
 
     #[Route('/user/{userId}/application/{applicationId}', name: 'update_user_application', methods: ['PUT'])]
@@ -113,7 +113,7 @@ class ApplicationController extends AbstractController
     {
         $application = $applicationRepository->find($applicationId);
         if (!$application) {
-            return new JsonResponse(['error' => 'Candidature non trouvée'], 404);
+            return $this->json(['error' => 'Candidature non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
         $data = json_decode($request->getContent(), true);
@@ -125,6 +125,6 @@ class ApplicationController extends AbstractController
         $entityManager->persist($application);
         $entityManager->flush();
 
-        return new JsonResponse(['message' => 'Candidature mise à jour avec succès']);
+        return $this->json(['message' => 'Candidature mise à jour avec succès'], Response::HTTP_OK);
     }
 }

@@ -10,4 +10,5 @@ export interface Job {
   createdAt: string;
   updatedAt?: string;
   applications: string[];
+  job_id: number;
 }

@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { useUser } from "../../context/UserContext";
-import { useAuth } from "../../context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import PersonalInfoForm from "@/app/_components/Mon-profil/PersonalInfoForm";
@@ -29,7 +28,6 @@ const ClickableBlock: React.FC<ClickableBlockProps> = ({
 );
 
 const ProfilePage = () => {
-  const { token, isAuthenticated } = useAuth();
   const { user } = useUser();
   const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
 

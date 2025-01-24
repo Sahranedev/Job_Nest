@@ -11,6 +11,7 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   city: string;
+  cv_path: string;
 }
 
 export interface UserLogin {

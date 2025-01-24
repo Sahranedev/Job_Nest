@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Job } from "@/interfaces/Job";
 import { useAuth } from "../../context/AuthContext";
-import JobHomeCard from "@/app/_components/Job/JobCard";
+import JobCard from "@/app/_components/Job/JobCard";
 
 const JobSearchResultsPage = () => {
   const searchParams = useSearchParams();
@@ -57,7 +57,7 @@ const JobSearchResultsPage = () => {
         <div className="w-full flex flex-col gap-6">
           <h3>Résultats de la recherche</h3>
           {jobs.length > 0 ? (
-            jobs.map((job) => <JobHomeCard key={job.id} job={job} />)
+            jobs.map((job) => <JobCard key={job.id} job={job} />)
           ) : (
             <p>Aucun résultat trouvé</p>
           )}

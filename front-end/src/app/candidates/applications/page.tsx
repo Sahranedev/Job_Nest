@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Job } from "@/interfaces/Job";
 import { useUser } from "../../context/UserContext";
 import { useAuth } from "../../context/AuthContext";
-import JobCard from "@/app/_components/Job/JobCard";
+import JobCardApplications from "@/app/_components/Job/JobCardApplications";
 
 const CandidatesApplicationsPage = () => {
   const { token, isAuthenticated } = useAuth();
@@ -17,7 +17,7 @@ const CandidatesApplicationsPage = () => {
     const fetchApplication = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/${user?.id}/applications`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/${user?.id}/applications-details`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -44,11 +44,11 @@ const CandidatesApplicationsPage = () => {
   }, [router, token, user?.id, isAuthenticated]);
 
   return (
-    <div>
-      <p>MES CANDIDATURES</p>
-      <div>
+    <div className="container mx-auto  flex gap-6 mt-24 border border-red-600">
+      <div className=" border border-blue-600 mt-6 w-2/3">
+        <p>MES CANDIDATURES</p>
         {applications?.map((application) => (
-          <JobCard key={application.id} job={application} />
+          <JobCardApplications key={application.id} job={application} />
         ))}
       </div>
     </div>
