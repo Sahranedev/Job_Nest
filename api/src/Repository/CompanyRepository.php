@@ -29,18 +29,15 @@ class CompanyRepository extends ServiceEntityRepository
 
     public function createOneCompany(array $data, UserRepository $userRepository, EntityManagerInterface $entityManager): Company
     {
-        // Vérification des données obligatoires
         if (!isset($data['name'], $data['description'], $data['website'], $data['user_id'])) {
-            throw new \InvalidArgumentException('Invalid data');
+            throw new \InvalidArgumentException('Données manquantes');
         }
 
-        // Récupération de l'utilisateur
         $user = $userRepository->find($data['user_id']);
         if (!$user) {
-            throw new \Exception('User not found');
+            throw new \Exception('Utilsateur non trouvé');
         }
 
-        // Création de l'entité Company
         $company = new Company();
         $company->setUser($user);
         $company->setName($data['name']);
@@ -49,7 +46,6 @@ class CompanyRepository extends ServiceEntityRepository
         $company->setCreatedAt(new \DateTimeImmutable());
         $company->setUpdatedAt(new \DateTimeImmutable());
 
-        // Persistance de l'entité
         $entityManager->persist($company);
         $entityManager->flush();
 

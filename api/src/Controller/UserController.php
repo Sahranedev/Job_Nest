@@ -82,7 +82,7 @@ class UserController extends AbstractController
         $user = $this->userRepository->findOneById($id);
 
         if (!$user) {
-            return new JsonResponse(['error' => 'Utilisateur introuvable'], Response::HTTP_NOT_FOUND);
+            return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_NOT_FOUND);
         }
 
         return $this->json([
@@ -105,6 +105,7 @@ class UserController extends AbstractController
     public function register(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        //requestToArray
 
         $user = new User();
         $user->setEmail($data['email']);
@@ -112,7 +113,7 @@ class UserController extends AbstractController
         $user->setFirstName($data['firstName']);
         $user->setLastName($data['lastName']);
         $user->setPhoneNumber($data['phoneNumber']);
-        $user->setCity($data['city']);
+        $user->setCity(city: $data['city']);
         $user->setAddress($data['address']);
         $user->setAge($data['age']);
         $user->setRole(UserRole::from($data['role']));
@@ -121,7 +122,7 @@ class UserController extends AbstractController
 
         $this->userRepository->save($user);
 
-        return new JsonResponse(['message' => 'Utilisateur créé avec succès'], Response::HTTP_CREATED);
+        return $this->json(['message' => 'Utilisateur créé avec succès'], Response::HTTP_CREATED);
     }
 
     // UPLOAD DU CV
@@ -134,18 +135,14 @@ class UserController extends AbstractController
 
         if (!$file) {
             $this->logger->error('Aucun fichier fourni');
-            return new JsonResponse(['error' => 'Aucun fichier fourni'], 400);
+            return $this->json(['error' => 'Aucun fichier fourni'], 400);
         }
 
         $this->logger->info('Fichier reçu', ['filename' => $file->getClientOriginalName()]);
 
-        $user->setCvFile($file);
+        $user->setCvFile(cvFile: $file);
 
-        // Ajoute le debugging ici :
-        $this->logger->debug('CvFile après setCvFile:', [
-            'cv_file' => $user->getCvFile(),
-            'cv_path' => $user->getCvPath(),
-        ]);
+
 
         $userRepository->save($user);
 

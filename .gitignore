@@ -12,6 +12,7 @@ api/vendor/
 api/public/bundles/
 api/composer.lock
 api/node_modules/
+api/public/uploads/*
 
 # Next.js (front-end)
 front-end/node_modules/
