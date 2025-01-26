@@ -42,7 +42,8 @@ read -p "📡 Entrez le port de votre base de données (3306 par défaut) : " db
 db_port=${db_port:-3306}
 
 # Modifier DATABASE_URL dans .env
-sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"mysql://$db_user:$db_password@$db_host:$db_port/$db_name?serverVersion=8.0.40&charset=utf8\"|" .env
+awk '/^DATABASE_URL=/{sub($0, "DATABASE_URL=\"mysql://'"$db_user"':'"$db_password"'@'"$db_host"':'"$db_port"'/'"$db_name"'?serverVersion=8.0.40&charset=utf8\"")}1' .env > .env.tmp && mv .env.tmp .env
+
 
 echo "✅ Configuration de la connexion à la base de données mise à jour."
 
