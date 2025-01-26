@@ -15,7 +15,13 @@ if [ ! -f .env ]; then
     fi
 fi
 
-# Étape 2 : Demander les informations de la base de données
+# Étape 2 : Générer un APP_SECRET
+echo "🔑 Génération d'un nouvel APP_SECRET..."
+app_secret=$(openssl rand -hex 32)
+sed -i "s|^APP_SECRET=.*|APP_SECRET=$app_secret|" .env
+echo "✅ APP_SECRET généré et ajouté au fichier .env."
+
+# Étape 3 : Demander les informations de la base de données
 read -p "💾 Entrez le nom de votre base de données : " db_name
 read -p "👤 Entrez le nom d'utilisateur de la base de données : " db_user
 read -s -p "🔑 Entrez le mot de passe de la base de données : " db_password
@@ -25,7 +31,7 @@ db_host=${db_host:-127.0.0.1}
 read -p "📡 Entrez le port de votre base de données (3306 par défaut) : " db_port
 db_port=${db_port:-3306}
 
-# Étape 3 : Modifier DATABASE_URL dans .env
+# Étape 4 : Modifier DATABASE_URL dans .env
 echo "🔄 Mise à jour de la configuration de la base de données dans .env..."
 sed -i '/^DATABASE_URL=/c\DATABASE_URL="mysql://'"$db_user"':'"$db_password"'@'"$db_host"':'"$db_port"'/'"$db_name"'?serverVersion=8.0.40&charset=utf8"' .env
 
@@ -37,22 +43,26 @@ else
     exit 1
 fi
 
-# Étape 4 : Installation des dépendances Composer
+# Étape 5 : Installation des dépendances Composer
 echo "📦 Installation des dépendances Composer..."
 composer install
 
-# Étape 5 : Création de la base de données
+# Étape 6 : Création de la base de données
 echo "🗄️ Création de la base de données..."
 php bin/console doctrine:database:create --if-not-exists
 
-# Étape 6 : Application des migrations
+# Étape 7 : Application des migrations
 echo "🛠️ Application des migrations..."
 php bin/console doctrine:migrations:migrate --no-interaction
 
 echo "✅ Migrations appliquées avec succès."
 
-# Étape 7 : Installation des fixtures  
+# Étape 8 : Génération des clés JWT
+echo "🔐 Génération des clés JWT..."
+php bin/console lexik:jwt:generate-keypair --overwrite
+echo "✅ Clés JWT générées avec succès."
 
+# Étape 9 : Installation des fixtures
 read -p "📦 Voulez-vous installer les fixtures ? (y/n) : " install_fixtures
 
 if [ "$install_fixtures" == "y" ]; then
