@@ -26,12 +26,31 @@ read -p "📡 Entrez le port de votre base de données (3306 par défaut) : " db
 db_port=${db_port:-3306}
 
 # Étape 3 : Modifier DATABASE_URL dans .env
-sed -i "s|^DATABASE_URL=.*|DATABASE_URL=\"mysql://$db_user:$db_password@$db_host:$db_port/$db_name?serverVersion=8.0.40&charset=utf8\"|" .env
-echo "✅ Configuration de la connexion à la base de données mise à jour."
+echo "🔄 Mise à jour de la configuration de la base de données dans .env..."
+sed -i '/^DATABASE_URL=/c\DATABASE_URL="mysql://'"$db_user"':'"$db_password"'@'"$db_host"':'"$db_port"'/'"$db_name"'?serverVersion=8.0.40&charset=utf8"' .env
 
-# Étape 4 : Continuer avec les autres étapes
+# Vérification du remplacement
+if grep -q "^DATABASE_URL=" .env; then
+    echo "✅ Configuration de la connexion à la base de données mise à jour avec succès."
+else
+    echo "❌ Échec lors de la mise à jour de DATABASE_URL dans le fichier .env."
+    exit 1
+fi
+
+# Étape 4 : Installation des dépendances Composer
+echo "📦 Installation des dépendances Composer..."
 composer install
+
+# Étape 5 : Création de la base de données
+echo "🗄️ Création de la base de données..."
 php bin/console doctrine:database:create --if-not-exists
+
+# Étape 6 : Application des migrations
+echo "🛠️ Application des migrations..."
 php bin/console doctrine:migrations:migrate --no-interaction
 
-echo "✅ Configuration terminée !"
+echo "✅ Migrations appliquées avec succès."
+
+echo "============================"
+echo "✅ Configuration terminée avec succès ! Vous pouvez maintenant lancer votre application Symfony."
+echo "============================"
