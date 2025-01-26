@@ -3,9 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ApplicationRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\ApiResource;
+use App\Enum\ApplicationStatus;
 
 
 #[ORM\Entity(repositoryClass: ApplicationRepository::class)]
@@ -36,6 +35,8 @@ class Application
     #[ORM\JoinColumn(nullable: false)]
     private ?Job $job = null;
 
+    #[ORM\Column(length: 255)]
+    private string $status = ApplicationStatus::SUBMITTED->value;
     public function getId(): ?int
     {
         return $this->id;
@@ -112,4 +113,57 @@ class Application
 
         return $this;
     }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function getStatusAsEnum(): ApplicationStatus
+    {
+        return ApplicationStatus::from($this->status);
+    }
+
+    public function setStatus(string $status): self
+    {
+
+        if (!ApplicationStatus::tryFrom($status)) {
+            throw new \InvalidArgumentException(sprintf('Le status de la candidature "%s" est invalide.', $status));
+        }
+
+        $this->status = $status;
+
+        return $this;
+    }
+
+
+
+    // Ci dessous les méthodes de transition de status de candidature sans utiliser le Workflow de Symfony
+
+
+    /*  public function submit(): void
+     {
+
+         $this->setStatus(ApplicationStatus::SUBMITTED);
+     }
+
+     public function underReview(): void
+     {
+         if ($this->getStatus() === ApplicationStatus::SUBMITTED)
+             $this->setStatus(ApplicationStatus::UNDER_REVIEW);
+
+     }
+
+     public function reject(): void
+     {
+         if ($this->getStatus() === ApplicationStatus::UNDER_REVIEW)
+             $this->setStatus(ApplicationStatus::REJECTED);
+     }
+
+     public function accept(): void
+     {
+         if ($this->getStatus() === ApplicationStatus::UNDER_REVIEW)
+             $this->setStatus(ApplicationStatus::ACCEPTED);
+     } */
+
 }

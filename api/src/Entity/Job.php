@@ -181,7 +181,7 @@ class Job
     public function publish(): void
     {
         if ($this->getStatus() !== JobStatus::DRAFT) {
-            throw new \Exception('Only draft jobs can be published.');
+            throw new \Exception('Seulement les jobs en draft peuvent être publés');
         }
         $this->setStatus(JobStatus::PUBLISHED);
     }
@@ -189,7 +189,7 @@ class Job
     public function close(): void
     {
         if ($this->getStatus() !== JobStatus::PUBLISHED) {
-            throw new \Exception('Only published jobs can be closed.');
+            throw new \Exception('Seulement les offres publiées peuvent être fermées.');
         }
         $this->setStatus(JobStatus::CLOSED);
     }
@@ -197,7 +197,7 @@ class Job
     public function draft(): void
     {
         if ($this->getStatus() !== JobStatus::CLOSED) {
-            throw new \Exception('Only closed jobs can be drafted.');
+            throw new \Exception('Seulement les offres fermées peuvent être mises en draft.');
         }
         $this->setStatus(JobStatus::DRAFT);
     }

@@ -13,8 +13,10 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Service\DateFormatterService;
 use App\Event\ApplicationCreatedEvent;
+use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Workflow\Registry;
 
 
 
@@ -120,4 +122,62 @@ class ApplicationController extends AbstractController
 
         return $this->json(['message' => 'Candidature mise à jour avec succès'], Response::HTTP_OK);
     }
+
+
+    #[Route('/api/applications/{id}/workflow/{transition}', name: 'application_workflow', methods: ['POST'])]
+    public function applyWorkflowTransition(
+        int $id,
+        string $transition,
+        ApplicationRepository $applicationRepository,
+        EntityManagerInterface $entityManager,
+        Registry $workflowRegistry,
+    ): JsonResponse {
+        // Nettoyer la transition
+        $transition = trim($transition);
+
+        // Récupérer l'application par son ID
+        $application = $applicationRepository->find($id);
+
+        if (!$application) {
+            return $this->json(['error' => 'Candidature non trouvée'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Récupérer le workflow spécifique à l'entité Application
+        $applicationWorkflow = $workflowRegistry->get($application, 'application');
+
+        try {
+            // Vérifier si la transition est possible
+            if (!$applicationWorkflow->can($application, $transition)) {
+                return $this->json([
+                    'error' => sprintf(
+                        'La transition "%s" ne peut pas être appliquée à la candidature dans l\'état "%s".',
+                        $transition,
+                        $application->getStatus(),
+                    ),
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Appliquer la transition
+            $applicationWorkflow->apply($application, $transition);
+
+            // Persister les changements
+            $entityManager->persist($application);
+            $entityManager->flush();
+
+            return $this->json([
+                'message' => sprintf(
+                    'La transition "%s" a été appliquée. Nouvel état : "%s".',
+                    $transition,
+                    $application->getStatus(),
+                ),
+            ]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+
 }

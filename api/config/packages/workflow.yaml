@@ -1,0 +1,27 @@
+framework:
+  workflows:
+    application:
+      type: state_machine
+      marking_store:
+        type: method
+        property: status
+      supports:
+        - App\Entity\Application
+      places:
+        - SUBMITTED
+        - UNDER_REVIEW
+        - ACCEPTED
+        - REJECTED
+      transitions:
+        to_review:
+          from: SUBMITTED
+          to: UNDER_REVIEW
+          guard: "is_granted('ROLE_RECRUITER')"
+        accept:
+          from: UNDER_REVIEW
+          to: ACCEPTED
+          guard: "is_granted('ROLE_RECRUITER')"
+        reject:
+          from: UNDER_REVIEW
+          to: REJECTED
+          guard: "is_granted('ROLE_RECRUITER')"

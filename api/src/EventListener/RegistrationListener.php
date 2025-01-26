@@ -19,7 +19,7 @@ class RegistrationListener
 
     public function onRegistration(RegistrationEvent $event): void
     {
-        $this->logger->info('ApplicationCreatedListener déclenché');
+        $this->logger->info('RegistrationEvent déclenché');
         $user = $event->getUser();
         $this->mailerService->sendRegistrationConfirmation($user);
     }
