@@ -20,5 +20,22 @@ services:
       - "../src/Entity/"
       - "../src/Kernel.php"
 
-  # add more service definitions when explicit configuration is needed
-  # please note that last definitions always *replace* previous ones
+  # Explicit service definition for ApplicationCreatedListener
+  App\EventListener\ApplicationCreatedListener:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: App\Event\ApplicationCreatedEvent,
+          method: onApplicationCreated,
+        }
+
+  App\EventListener\RegistrationListener:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: App\Event\RegistrationEvent,
+          method: onRegistration,
+        }
+
+  # Add more service definitions when explicit configuration is needed
+  # Please note that last definitions always *replace* previous ones

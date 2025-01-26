@@ -4,38 +4,34 @@ namespace App\Controller;
 
 use App\Entity\Application;
 use App\Repository\ApplicationRepository;
-use App\Repository\JobRepository;
-use App\Repository\UserRepository;
-use App\Service\MailerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Denormalizer\ApplicationDenormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Service\DateFormatterService;
+use App\Event\ApplicationCreatedEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
+
+
 
 
 class ApplicationController extends AbstractController
 {
 
     private DateFormatterService $dateFormatter;
+    private LoggerInterface $logger;
 
-    public function __construct(DateFormatterService $dateFormatter)
+    public function __construct(DateFormatterService $dateFormatter, LoggerInterface $logger)
     {
         $this->dateFormatter = $dateFormatter;
+        $this->logger = $logger;
     }
 
 
-    #[Route('/application', name: 'app_application')]
-    public function index(): Response
-    {
-        return $this->render('application/index.html.twig', [
-            'controller_name' => 'ApplicationController',
-        ]);
-    }
 
     #[Route('api/user/{id}/applications', name: 'user_applications', methods: ['GET'])]
     public function getApplicationsByUser(ApplicationRepository $applicationRepository, int $id): JsonResponse
@@ -55,11 +51,9 @@ class ApplicationController extends AbstractController
     public function createApplication(
         Request $request,
         SerializerInterface $serializer,
-        MailerService $mailerService,
         EntityManagerInterface $entityManager,
+        EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
-
-
         try {
             $application = $serializer->deserialize($request->getContent(), Application::class, 'json');
 
@@ -70,13 +64,12 @@ class ApplicationController extends AbstractController
             return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
 
-        $mailerService->sendApplicationConfirmationToCandidate($application);
-        $mailerService->sendNewApplicationNotificationToCompany($application);
+        $eventDispatcher->dispatch(new ApplicationCreatedEvent($application));
+        $this->logger->info('ApplicationCreatedEvent dispatché');
 
-
-
-        return $this->json(['message' => 'Candidature créee avec succès !'], Response::HTTP_CREATED);
+        return $this->json(['message' => 'Candidature créée avec succès !'], Response::HTTP_CREATED);
     }
+
 
     #[Route('/api/user/{id}/applications-details', name: 'user_applications_with_jobs', methods: ['GET'])]
     public function getApplicationDetailsByUser(

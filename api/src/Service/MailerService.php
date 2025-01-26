@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Application;
+use App\Entity\User;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
@@ -59,6 +60,22 @@ class MailerService
                 $application->getUser()->getFirstName(),
                 $application->getUser()->getLastName(),
                 $application->getCoverLetter() ?: 'Aucune lettre de motivation'
+            ));
+
+        $this->mailer->send($email);
+    }
+
+    public function sendRegistrationConfirmation(User $user): void
+    {
+        $userEmail = $user->getEmail();
+        $email = (new Email())
+            ->from('no-reply@nestjob.com')
+            ->to($userEmail)
+            ->subject('Bienvenue sur JobNest !')
+            ->text(sprintf(
+                "Bonjour %s,\n\nMerci pour votre confiance, \nBienvenue au sein de l'application JobNest.",
+                $user->getFirstName(),
+                $user->getEmail(),
             ));
 
         $this->mailer->send($email);

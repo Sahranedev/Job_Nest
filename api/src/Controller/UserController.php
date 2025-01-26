@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use App\Event\RegistrationEvent;
 use Psr\Log\LoggerInterface;
 
 
@@ -35,7 +37,7 @@ class UserController extends AbstractController
         $user = $this->getUser();
 
         if (!$user instanceof User) {
-            return new JsonResponse(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            return $this->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
 
         return $this->json([
@@ -102,7 +104,7 @@ class UserController extends AbstractController
     }
     // ENREGISTRER UN UTILISATEUR
     #[Route('/register', name: 'user_register', methods: ['POST'])]
-    public function register(Request $request): JsonResponse
+    public function register(Request $request, EventDispatcherInterface $eventDispatcher): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         //requestToArray
@@ -121,6 +123,9 @@ class UserController extends AbstractController
         $user->setUpdatedAt(new \DateTimeImmutable());
 
         $this->userRepository->save($user);
+
+        $eventDispatcher->dispatch(new RegistrationEvent($user));
+
 
         return $this->json(['message' => 'Utilisateur créé avec succès'], Response::HTTP_CREATED);
     }
