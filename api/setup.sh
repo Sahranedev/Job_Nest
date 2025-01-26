@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "============================"
-echo "✨ Symfony Project Setup ✨"
+echo "✨ Setup du projet JobNest de Sahrane Guassemi ✨"
 echo "============================"
 
 # Étape 1 : Vérifier la présence du fichier .env
@@ -50,6 +50,18 @@ echo "🛠️ Application des migrations..."
 php bin/console doctrine:migrations:migrate --no-interaction
 
 echo "✅ Migrations appliquées avec succès."
+
+# Étape 7 : Installation des fixtures  
+
+read -p "📦 Voulez-vous installer les fixtures ? (y/n) : " install_fixtures
+
+if [ "$install_fixtures" == "y" ]; then
+    echo "📦 Installation des fixtures..."
+    php bin/console doctrine:fixtures:load --no-interaction
+    echo "✅ Fixtures installées avec succès."
+else
+    echo "🚫 Installation des fixtures annulée."
+fi
 
 echo "============================"
 echo "✅ Configuration terminée avec succès ! Vous pouvez maintenant lancer votre application Symfony."
