@@ -2,11 +2,10 @@
 
 namespace App\Controller;
 
-use App\Dto\JobDto;
 use App\Enum\JobStatus;
 use App\Repository\ApplicationRepository;
 use App\Repository\JobRepository;
-use App\Repository\CompanyRepository;
+use App\Service\JobService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,13 +16,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class JobController extends AbstractController
 {
-    #[Route(path: '/job', name: 'app_job')]
-    public function index(): Response
+
+    private $jobService;
+
+    public function __construct(JobService $jobService)
     {
-        return $this->render('job/index.html.twig', [
-            'controller_name' => 'JobController',
-        ]);
+        $this->jobService = $jobService;
     }
+
 
     // RECUPERER LES JOBS D'UN UTILISATEUR
     #[Route('/user/{id}/jobs', name: 'user_jobs', methods: ['GET'])]
@@ -58,33 +58,22 @@ class JobController extends AbstractController
         return $this->json($job);
     }
 
+
     #[Route('/api/jobs', name: 'create_job', methods: ['POST'])]
-    public function createJob(
-        Request $request,
-        CompanyRepository $companyRepository,
-        EntityManagerInterface $entityManager,
-        JobRepository $jobRepository,
-    ): JsonResponse {
+    public function createJob(Request $request): JsonResponse
+    {
         $data = json_decode($request->getContent(), true);
 
         try {
-            $job = $jobRepository->createJob($data, $companyRepository, $entityManager);
+            $jobDto = $this->jobService->createJob($data);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
-
-
-        $jobDto = new JobDto(
-            $job->getId(),
-            $job->getTitle(),
-            $job->getDescription(),
-            $job->getLocation(),
-            $job->getType()->value,
-            $job->getCompany()->getName(),
-        );
 
         return $this->json($jobDto, Response::HTTP_CREATED);
     }
+
+
 
     #[Route('/api/jobs/{id}/status', name: 'update_job_status', methods: ['PATCH'])]
     public function updateJobStatus(
@@ -101,13 +90,13 @@ class JobController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
         if (!isset($data['status'])) {
-            return new JsonResponse(['error' => 'Status is required'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Status is required'], Response::HTTP_BAD_REQUEST);
         }
 
         try {
             $newStatus = JobStatus::from($data['status']);
         } catch (\ValueError $e) {
-            return new JsonResponse(['error' => 'Invalid status'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Invalid status'], Response::HTTP_BAD_REQUEST);
         }
 
         try {
@@ -126,10 +115,10 @@ class JobController extends AbstractController
             }
             $entityManager->flush();
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
 
-        return new JsonResponse(['message' => 'Job status updated successfully'], Response::HTTP_OK);
+        return $this->json(['message' => "Statut de l'offre mis à jour avec succès."], Response::HTTP_OK);
     }
 
     #[Route('/api/jobs/search', name: 'search_jobs', methods: ['GET'])]
@@ -139,7 +128,7 @@ class JobController extends AbstractController
         $location = $request->query->get('location');
 
         if (!$title && !$location) {
-            return new JsonResponse(
+            return $this->json(
                 ['error' => 'At least one search parameter (title or location) must be provided.'],
                 Response::HTTP_BAD_REQUEST,
             );

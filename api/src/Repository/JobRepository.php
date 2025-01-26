@@ -40,28 +40,7 @@ class JobRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function createJob(array $data, CompanyRepository $companyRepository, EntityManagerInterface $entityManager): Job
-    {
-        $company = $companyRepository->find($data['company_id']);
 
-        if (!$company) {
-            throw new \Exception('Company not found');
-        }
-
-        $job = new Job();
-        $job->setTitle($data['title']);
-        $job->setDescription($data['description']);
-        $job->setLocation($data['location']);
-        $job->setType(JobType::from($data['type']));
-        $job->setStatus(JobStatus::DRAFT);
-        $job->setCompany(company: $company);
-        $job->setCreatedAt(new \DateTimeImmutable());
-
-        $entityManager->persist($job);
-        $entityManager->flush();
-
-        return $job;
-    }
 
     public function searchJobs(?string $title, ?string $location): array
     {
