@@ -18,7 +18,7 @@ class ApplicationDenormalizer implements DenormalizerInterface
         $this->userRepository = $userRepository;
     }
 
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, $format = null, array $context = []): mixed
     {
         $job = $this->jobRepository->find($data['job_id']);
         $user = $this->userRepository->find($data['user_id']);
@@ -38,12 +38,18 @@ class ApplicationDenormalizer implements DenormalizerInterface
         }
         $application->setCreatedAt(new \DateTimeImmutable());
 
-
         return $application;
     }
 
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         return $type === Application::class;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            Application::class => true,
+        ];
     }
 }
