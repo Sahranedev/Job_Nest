@@ -51,9 +51,9 @@ class ApplicationRepository extends ServiceEntityRepository
     public function findApplicationsWithJobDetailsByUserId(int $userId): array
     {
         return $this->createQueryBuilder('app')
-            ->innerJoin('app.job', 'job') // Jointure avec l'entité Job
-            ->andWhere('app.user = :userId') // Condition pour filtrer les candidatures de l'utilisateur
-            ->setParameter('userId', $userId) // Paramètre utilisateur
+            ->innerJoin('app.job', 'job')
+            ->andWhere('app.user = :userId')
+            ->setParameter('userId', $userId)
             ->select('app.id, app.cover_letter, app.createdAt, job.id AS job_id, job.title, job.location, job.type, job.status, app.resume_path')
             ->orderBy('app.createdAt', 'DESC')
             ->getQuery()

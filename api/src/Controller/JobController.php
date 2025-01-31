@@ -49,10 +49,10 @@ class JobController extends AbstractController
         $job = $jobRepository->getJobById($id);
 
         if (!$job) {
-            return $this->json(['error' => 'Job not found'], Response::HTTP_NOT_FOUND);
+            return $this->json(['error' => 'Job introuvable'], Response::HTTP_NOT_FOUND);
         }
 
-        // Formater la date avant de retourner la réponse
+        // Je formate la date avant de retourner la réponse
         $job['createdAt'] = $dateFormatterService->formatDate($job['createdAt']);
 
         return $this->json($job);
@@ -85,18 +85,18 @@ class JobController extends AbstractController
         $job = $jobRepository->find($id);
 
         if (!$job) {
-            return new JsonResponse(['error' => 'Job not found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => 'Job introuvable'], Response::HTTP_NOT_FOUND);
         }
 
         $data = json_decode($request->getContent(), true);
         if (!isset($data['status'])) {
-            return $this->json(['error' => 'Status is required'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Status est requis'], Response::HTTP_BAD_REQUEST);
         }
 
         try {
             $newStatus = JobStatus::from($data['status']);
         } catch (\ValueError $e) {
-            return $this->json(['error' => 'Invalid status'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Status invalide'], Response::HTTP_BAD_REQUEST);
         }
 
         try {
@@ -129,7 +129,7 @@ class JobController extends AbstractController
 
         if (!$title && !$location) {
             return $this->json(
-                ['error' => 'At least one search parameter (title or location) must be provided.'],
+                ['error' => 'Au moins un paramètre de recherche est requis (title oulocation)'],
                 Response::HTTP_BAD_REQUEST,
             );
         }

@@ -170,7 +170,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setRole(UserRole $role): self
     {
-        $this->role = $role->value; // j'enregistre la valeur de l'enum dans la base
+        $this->role = $role->value;
         return $this;
     }
 

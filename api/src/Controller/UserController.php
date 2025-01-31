@@ -37,7 +37,7 @@ class UserController extends AbstractController
         $user = $this->getUser();
 
         if (!$user instanceof User) {
-            return $this->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            return $this->json(['error' => 'Requête non autorisée'], Response::HTTP_UNAUTHORIZED);
         }
 
         return $this->json([
@@ -135,8 +135,8 @@ class UserController extends AbstractController
     #[Route('/api/upload-cv', name: 'user_upload_cv', methods: ['POST'])]
     public function uploadCv(Request $request, UserRepository $userRepository): JsonResponse
     {
-        $user = $this->getUser(); // Récupère l'utilisateur connecté
-        $file = $request->files->get('cv'); // Récupère le fichier uploadé
+        $user = $this->getUser();
+        $file = $request->files->get('cv');
 
         if (!$file) {
             $this->logger->error('Aucun fichier fourni');

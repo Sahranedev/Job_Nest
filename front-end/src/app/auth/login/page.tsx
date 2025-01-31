@@ -20,6 +20,8 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import Image from "next/image";
+import logo from "../../../../public/job_nest_logo_blanc.svg";
 
 const LoginPage = () => {
   const [error, setError] = useState("");
@@ -117,6 +119,7 @@ const LoginPage = () => {
       </div>
       {/* BLOC DE DROITE */}
       <div className="w-1/2 flex flex-col justify-center items-center bg-[#2C2638]">
+        <Image src={logo} alt="Job Nest Logo" className="mb-8" />
         <h1 className="text-4xl font-bold text-white">Se connecter</h1>
         <div className="w-1/2 ">
           <Form {...form}>

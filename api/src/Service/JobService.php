@@ -31,7 +31,7 @@ class JobService
         $company = $this->companyRepository->find($data['company_id']);
 
         if (!$company) {
-            throw new \Exception('Company not found');
+            throw new \Exception('Company introuvable');
         }
 
         $job = new Job();
