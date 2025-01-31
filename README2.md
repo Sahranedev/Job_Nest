@@ -137,11 +137,11 @@ a la place de {transition} il faut donner le nom des transitions qu'on a configu
 - accept
 - reject
 
-**Point de réfléxion :** J'utilise un autre changement d'était dans l'application qui est l'état d'une offre d'emploi, j'ai utilisé l'approche classique dessus avec des ENUM et une méthode patch pour mettre à jour, j'ai volontairement pas utilisé le workflow pour cet état pour montrer les deux façons de faire et que je n'étais pas sur d'utiliser le workflow de la meilleure des manières.
+**Point de réfléxion :** J'utilise un autre changement d'état dans l'application qui est l'état d'une offre d'emploi, j'ai utilisé l'approche classique dessus avec des ENUM et une méthode patch pour mettre à jour, j'ai volontairement pas utilisé le workflow pour cet état pour montrer les deux façons de faire et que je n'étais pas sur d'utiliser le workflow de la meilleure des manières.
 
 ### BONUS
 
-Si vous le souhaitez je vous ai préparé des body json pour tester les routes :
+Si vous le souhaitez je vous ai préparé des body json pour tester les routes (par contre vous n'aurez pas les jeux de données associés via la fixture load il faudra tout créer vous même) sinon prenez les données de la fixture load:
 
 - Créer un **Candidat** :
 
@@ -204,7 +204,7 @@ Postuler à une **offre d'emploi** :
   "job_id": {id de l'offre d'emploi},
   "user_id": {id du candidat},
   "cover_letter": "Je m'appelle Guichard et je suis passionné par les seismes.",
-  "resume_path": "/uploads/cv/{nom_du_fichier.pdf}" /* pas encore implémenté dans l'application */
+  "resume_path": "/uploads/cv/{nom_du_fichier.pdf}"
 }
 ```
 
@@ -214,8 +214,8 @@ J'ai décidé de me mettre seul sur ce projet pour pouvoir découvrir les bases 
 
 On avait discuter sur le fait d'optimiser les requêtes controller par exemple la création d'un utilisateur au lieu de set chaque champ un par un et de peut être utiliser un serializer, j'ai réussi mais à moitié à cause de l'enum qui n'était pas reconnu par le serializer et je n'ai pas réussi à trouver une solution pour le moment, j'ai du donc laisser comme c'était pour que l'application reste fonctionnelle.
 
-Les test unitaires sont également dérisoire j'ai juste commencer un suivre un petit tutoriel que je n'ai pas encore fini mais je compte bien les finir et mettre en place également des tests d'intégrations/fonctionels.
+Les test unitaires sont également dérisoire j'ai juste commencer à suivre un petit tutoriel que je n'ai pas encore fini mais je compte bien les finir et mettre en place également des tests d'intégrations/fonctionels.
 
-Le front-end n'est pas très avancé vu que ce n'était pas la priorité mais j'ai quand même essayé de mettre en place une architecture intéressante, je l'espère, avec React Next et zod pour les formulaires.
+Le front-end n'est pas très avancé vu que ce n'était pas la priorité, mais j'ai quand même essayé de mettre en place une architecture intéressante, je l'espère, avec React Next et zod pour les formulaires.
 
 J'ai bien évidemment pas eu le temps de faire tout ce que je voulais mais j'ai beaucoup aimé travailler sur ce projet. J'ai plein d'idées pour la suite et j'ai hâte de le continuer et de faire une vraie appliction pour la déployer et la présenter dans mon portfolio.

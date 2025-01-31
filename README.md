@@ -56,7 +56,13 @@ php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 ```
 
-**_*7) Générer les clés JsonWebToken*_**
+**_*7) Ajout des fixtures pour le jeu de données*_**
+
+```bash
+php bin/console doctrine:fixtures:load
+```
+
+**_*8) Générer les clés JsonWebToken*_**
 
 ```bash
 php bin/console lexik:jwt:generate-keypair
@@ -68,7 +74,7 @@ php bin/console lexik:jwt:generate-keypair
 php bin/console lexik:jwt:generate-keypair --passphrase="VotrePassphraseSécurisée"
 ```
 
-**_*8) Lancer le build docker de mailtrap par eaudeweb pour la gestion des envois de mails de l'application*_**
+**_*9) Lancer le build docker de mailtrap par eaudeweb pour la gestion des envois de mails de l'application*_**
 
 ```bash
 docker run -d --name=mailtrap -p 8940:80 -p 7321:25 eaudeweb/mailtrap
@@ -78,7 +84,7 @@ docker run -d --name=mailtrap -p 8940:80 -p 7321:25 eaudeweb/mailtrap
 nom d'utilisateur : mailtrap
 mot de passe : mailtrap
 
-**_*9) Lancer le serveur de développement en exécutant la commande suivante dans le terminal*_**
+**_*10) Lancer le serveur de développement en exécutant la commande suivante dans le terminal*_**
 
 ```bash
 symfony serve --no-tls
