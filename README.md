@@ -96,6 +96,8 @@ php bin/console doctrine:database:create --env=test
 php bin/console doctrine:migrations:migrate --env=test
 ```
 
+<!-- Ces commandes permettent de créer et configurer une base de données test -->
+
 ### Configuration de l'environnement de développement front-end
 
 **_1) Se rendre dans le dossier /front et exécuter la commande suivante dans le terminal pour installer les dépendances du projet_**

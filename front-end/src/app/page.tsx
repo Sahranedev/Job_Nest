@@ -9,7 +9,9 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (user) {
+    if (user === undefined) {
+      router.push("/auth/login");
+    } else if (user) {
       if (user.roles.includes("ROLE_CANDIDATE")) {
         router.push("/candidates");
       } else if (user.roles.includes("ROLE_RECRUITER")) {

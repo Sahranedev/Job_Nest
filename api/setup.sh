@@ -78,5 +78,5 @@ echo "🐳 Build de l'environnement docker pour la gestion des mails"
 docker run -d --name=mailtrap -p 8940:80 -p 7321:25 eaudeweb/mailtrap
 
 echo "============================"
-echo "✅ Configuration terminée avec succès ! Vous pouvez maintenant lancer votre application Symfony."
+echo "✅ Configuration terminée avec succès ! Vous pouvez maintenant lancer votre application Symfony :)"
 echo "============================"

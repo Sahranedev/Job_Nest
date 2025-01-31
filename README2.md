@@ -207,3 +207,15 @@ Postuler à une **offre d'emploi** :
   "resume_path": "/uploads/cv/{nom_du_fichier.pdf}" /* pas encore implémenté dans l'application */
 }
 ```
+
+### Observation Générale
+
+J'ai décidé de me mettre seul sur ce projet pour pouvoir découvrir les bases et les facettes vu que c'est mon premier projet en PHP et Symfony. Cela m'a permis d'apprendre beaucoup de chose et contrairement au début, j'apprécie beaucoup plus Symfony qu'il y a un mois.
+
+On avait discuter sur le fait d'optimiser les requêtes controller par exemple la création d'un utilisateur au lieu de set chaque champ un par un et de peut être utiliser un serializer, j'ai réussi mais à moitié à cause de l'enum qui n'était pas reconnu par le serializer et je n'ai pas réussi à trouver une solution pour le moment, j'ai du donc laisser comme c'était pour que l'application reste fonctionnelle.
+
+Les test unitaires sont également dérisoire j'ai juste commencer un suivre un petit tutoriel que je n'ai pas encore fini mais je compte bien les finir et mettre en place également des tests d'intégrations/fonctionels.
+
+Le front-end n'est pas très avancé vu que ce n'était pas la priorité mais j'ai quand même essayé de mettre en place une architecture intéressante, je l'espère, avec React Next et zod pour les formulaires.
+
+J'ai bien évidemment pas eu le temps de faire tout ce que je voulais mais j'ai beaucoup aimé travailler sur ce projet. J'ai plein d'idées pour la suite et j'ai hâte de le continuer et de faire une vraie appliction pour la déployer et la présenter dans mon portfolio.
